@@ -1,0 +1,36 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    
+    wire c0,c1,c2;
+    wire [15:0]sum_0,sum_1;
+    
+    add16 U0(
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(c0)
+    );
+
+    add16 U1(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum_0),
+        .cout(c1)
+    );
+    
+     add16 U2(
+        .a(a[31:16]),
+        .b(b[31:16]),
+         .cin(1'b1),
+         .sum(sum_1),
+         .cout(c2)
+    );
+    
+    assign sum[31:16] = c0?sum_1:sum_0;
+ 
+endmodule
