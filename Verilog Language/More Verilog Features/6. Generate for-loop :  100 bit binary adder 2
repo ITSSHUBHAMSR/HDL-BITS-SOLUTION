@@ -1,0 +1,27 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    
+    genvar i;
+    generate 
+        for(i=0;i<100;i=i+1)begin : adder_100_bits
+            if(i==0)
+            FA U0(a[0],b[0],cin,sum[0],cout[0]);    
+            else
+            FA U1(a[i],b[i],cout[i-1],sum[i],cout[i]);
+        end
+    endgenerate
+
+endmodule
+
+module FA(a,b,c,s,ca);
+    input a,b,c;
+    output s,ca;
+    
+    assign s=a^b^c;
+    assign ca=(a^b)&c|(a&b);
+    
+endmodule
