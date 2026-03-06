@@ -1,0 +1,26 @@
+module top_module (input x, input y, output z);
+    
+    wire z1,z2,z3,z4;
+    
+    IA1 U0(x,y,z1);
+    IB1 X0(x,y,z2);
+    IA1 U1(x,y,z3);
+    IB1 X1(x,y,z4);
+    
+    assign z= (z1|z2) | (z3&z4);
+
+endmodule
+
+module IA1(a,b,z);
+    input a,b;
+    output z;
+    
+    assign z = (a^b) & a;
+
+endmodule
+
+module IB1( input x, input y, output z );
+
+    assign z = (x==y)?1:0;
+    
+endmodule
