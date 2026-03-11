@@ -1,0 +1,19 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+);
+    reg [7:0] in_x=0;
+    
+    always@(posedge clk)begin
+        for(integer i=0;i<8;i=i+1)begin
+            if( (!in_x[i]) & (in[i]) )
+                pedge[i] <= 1;
+            else
+                pedge[i] <= 0;
+        end
+        in_x=in;
+    end
+                
+
+endmodule
