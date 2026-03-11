@@ -1,0 +1,17 @@
+module top_module (
+    input clk,
+    input j,
+    input k,
+    output Q); 
+    
+    always@(posedge clk)begin
+        case({j,k})
+            'd0 : Q <= Q;
+            'd1 : Q <= 0;
+            'd2 : Q <= 1;
+            'd3 : Q <= ~Q;
+            default : Q <= 0;
+        endcase
+    end
+
+endmodule
