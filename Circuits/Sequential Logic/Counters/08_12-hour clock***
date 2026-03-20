@@ -1,0 +1,123 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss); 
+    
+    wire en_ss;
+    wire en_mm0, en_mm1;
+    wire en_hh0, en_hh1;
+    wire en_pm;
+    
+    assign en_ss = (ena && (ss[3:0] == 'd9));
+    
+    assign en_mm0 = (ss[3:0] == 'd9) && (ss[7:4] == 'd5);
+    assign en_mm1 = (ss[3:0] == 'd9) && (ss[7:4] == 'd5) && (mm[3:0] == 'd9);
+    
+    assign en_hh0 = (ss[3:0] == 'd9) && (ss[7:4] == 'd5) && (mm[3:0] == 'd9) && (mm[7:4] == 'd5);
+    
+    assign en_pm = (ss[3:0] == 'd9) && (ss[7:4] == 'd5) && (mm[3:0] == 'd9) && (mm[7:4] == 'd5) && (hh[3:0] == 'd1) && (hh[7:4] == 'd1);
+    
+
+    
+    GC #(
+    .WIDTH(4),
+    .RESET_VALUE(0),
+    .MAX_COUNT(9),
+    .START_VALUE(0)
+    ) SS0 (
+    .clk(clk),
+    .rst(reset),
+    .en(ena),
+    .count(ss[3:0])
+    );
+    
+    GC #(
+     .WIDTH(3),
+    .RESET_VALUE(0),
+    .MAX_COUNT(5),
+    .START_VALUE(0)
+    ) SS1 (
+    .clk(clk),
+    .rst(reset),
+    .en(en_ss),
+    .count(ss[7:4])
+    );
+    
+    GC #(
+    .WIDTH(4),
+    .RESET_VALUE(0),
+    .MAX_COUNT(9),
+    .START_VALUE(0)
+    ) MM0 (
+    .clk(clk),
+    .rst(reset),
+    .en(en_mm0),
+    .count(mm[3:0])
+    );
+    
+    GC #(
+    .WIDTH(3),
+    .RESET_VALUE(0),
+    .MAX_COUNT(5),
+    .START_VALUE(0)
+    ) MM1 (
+    .clk(clk),
+    .rst(reset),
+    .en(en_mm1),
+    .count(mm[7:4])
+    );
+    
+    
+
+    always@(posedge clk)begin
+        if(reset)  begin hh[3:0] <= 'd2; hh[7:4] <= 'd1; end
+        else begin
+            if(en_hh0)begin
+                if( (hh[3:0] == 'd2) && (hh[7:4] == 'd1) )  begin hh[3:0] <= 'd1; hh[7:4] <= 'd0; end
+                else if( (hh[3:0] == 'd9) )  begin hh[3:0] <= 'd0; hh[7:4] <= 'd1; end
+                else if( (hh[3:0] == 'd0) && (hh[7:4] == 'd1) )  begin hh[3:0] <= 'd1; hh[7:4] <= 'd1; end 
+                else if( (hh[3:0] == 'd1) && (hh[7:4] == 'd1) )  begin hh[3:0] <= 'd2; hh[7:4] <= 'd1; end 
+                else hh[3:0] <= hh[3:0] +1;
+            end
+        end
+    end
+                
+    always@(posedge clk)begin
+        if(reset) pm <= 'd0;
+        else begin
+            if(en_pm) pm <= ~pm;
+            else pm <= pm;
+        end
+    end
+
+
+endmodule
+
+module GC
+    #( parameter WIDTH = 4,
+       parameter RESET_VALUE = 0,
+       parameter MAX_COUNT = 9,
+       parameter START_VALUE = 0
+     )
+     (
+    input clk,
+    input rst,
+    input en,
+         output reg [WIDTH-1:0] count);
+    
+    always@(posedge clk)begin
+        if(rst)
+            count <= RESET_VALUE;
+        else begin
+            if(en) begin
+            if(count == MAX_COUNT) count <= START_VALUE;
+            else                       count <= count+1;
+        end
+        end
+    end
+    
+endmodule
