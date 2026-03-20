@@ -1,6 +1,5 @@
 //Frequency divider HDL using BCD counters
 
-
 module top_module (
     input clk,
     input reset,
