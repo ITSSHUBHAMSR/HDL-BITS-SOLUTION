@@ -10,9 +10,7 @@ module top_module(
     reg state, next_state;
 
     always @(*) begin    // This is a combinational always block
-        // State transition logic
-        if(areset) state = B;
-        else       state = next_state;
+        state = next_state;
     end
 
     always @(posedge clk, posedge areset) begin    // This is a sequential always block
