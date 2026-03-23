@@ -1,3 +1,5 @@
+//Moore asyn-reset FSM
+
 module top_module(
     input clk,
     input areset,    // Asynchronous reset to state B
