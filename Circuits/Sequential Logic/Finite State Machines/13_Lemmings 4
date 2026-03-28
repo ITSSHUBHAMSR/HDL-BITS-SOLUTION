@@ -1,0 +1,57 @@
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+    
+   parameter LEFT=0, RIGHT=1, AAAH_LEFT=2, AAAH_RIGHT=3, DIG_L=4, DIG_R=5, SPLAT=6;
+    reg [2:0] state, next_state;
+    reg [9:0]count=0;
+
+    always @(*) begin
+        // State transition logic
+        state=next_state;
+    end
+
+    always @(posedge clk, posedge areset) begin
+        // State flip-flops with asynchronous reset
+        if(areset) begin next_state=LEFT; count=0; end
+        else begin
+            case(state)
+                LEFT : begin next_state=(!ground)?AAAH_LEFT:(dig?DIG_L:(bump_left?RIGHT:LEFT)); count=0; end
+                RIGHT : begin next_state=(!ground)?AAAH_RIGHT:(dig?DIG_R:(bump_right?LEFT:RIGHT)); count=0; end
+                AAAH_LEFT : begin
+                    if((count > 19) && ground)
+                        next_state=SPLAT;
+                    else
+                    next_state=ground?LEFT:AAAH_LEFT;
+                    count=count+1;
+                end
+                AAAH_RIGHT :  begin
+                    if((count >19) && ground)
+                        next_state=SPLAT;
+                    else
+                    next_state=ground?RIGHT:AAAH_RIGHT;
+                    count=count+1;
+                end
+                
+                DIG_L : begin next_state=ground?DIG_L:AAAH_LEFT; end
+                DIG_R : next_state=ground?DIG_R:AAAH_RIGHT;
+                SPLAT : next_state=areset?LEFT:SPLAT;
+            endcase
+        end
+    end
+
+    // Output logic
+    assign walk_left = (state == LEFT);
+    assign walk_right = (state == RIGHT);
+    assign aaah=(state==AAAH_LEFT)||(state==AAAH_RIGHT);
+    assign digging=(state==DIG_L)||(state==DIG_R);
+
+endmodule
