@@ -1,0 +1,43 @@
+module top_module (
+    input clk,
+    input reset,      // Synchronous reset
+    input data,
+    output shift_ena,
+    output counting,
+    input done_counting,
+    output done,
+    input ack );
+    
+    reg [3:0] state, next_state;
+    parameter S0=0, S1=1, S2=2, S3=3, S4=4, S5=5, S6=6, S7=7, S8=8, S9=9, S10=10;
+    
+    always@(*)begin
+        state = next_state;
+    end
+    
+    always@(posedge clk)begin
+        if(reset) 
+            next_state <= S0;
+        else begin
+            case(state)
+                S0 : next_state <= data?S1:S0;
+                S1 : next_state <= data?S2:S0;
+                S2 : next_state <= data?S2:S3;
+                S3 : next_state <= data?S4:S0;
+                S4 : next_state <= S5;
+                S5 : next_state <= S6;
+                S6 : next_state <= S7;
+                S7 : next_state <= S8;
+                S8 : next_state <= done_counting?S9:S8;
+                S9 : next_state <= ack?S10:S9;
+                S10 : next_state <= data?S1:S0;
+                default : next_state <= S0;
+            endcase
+        end
+    end
+    
+    assign shift_ena = (state==S4) || (state==S5) || (state==S6) || (state==S7);
+    assign counting = (state==S8);
+    assign done = (state==S9);
+
+endmodule
