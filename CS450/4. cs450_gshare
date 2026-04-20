@@ -1,4 +1,20 @@
-localparam SNT = 2'd0, WNT = 2'd1, WT = 2'd2, ST = 2'd3;
+module top_module(
+    input clk,
+    input areset,
+
+    input  predict_valid,
+    input  [6:0] predict_pc,
+    output reg predict_taken,
+    output reg [6:0] predict_history,
+
+    input train_valid,
+    input train_taken,
+    input train_mispredicted,
+    input [6:0] train_history,
+    input [6:0] train_pc
+);
+    
+    localparam SNT = 2'd0, WNT = 2'd1, WT = 2'd2, ST = 2'd3;
     
     reg [1:0] PHT [0:127];
     reg [6:0] GHR;
@@ -40,3 +56,5 @@ localparam SNT = 2'd0, WNT = 2'd1, WT = 2'd2, ST = 2'd3;
             end
         end
     end
+
+endmodule
